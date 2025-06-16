@@ -1,0 +1,19 @@
+---
+- name: tp0 install vim + check /etc/password
+  hosts: all
+  remote_user: ambient-user
+  become: true
+  become_user: root
+  vars:
+    passwordFile: /etc/passwd
+  tasks:
+
+  - name: Install vim
+    ansible.builtin.apt:
+      name: vim
+      state: present
+
+  - name: check {{ passwordFile }}
+    ansible.builtin.file:
+      path: "{{ passwordFile }}"
+      state: file
