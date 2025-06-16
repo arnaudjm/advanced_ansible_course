@@ -1,0 +1,30 @@
+---
+- name: tp2
+  hosts: all
+  remote_user: ambient-user
+  become: true
+  become_user: root
+  vars:
+    html_root: /var/www/html
+  tasks:
+
+  - name: Install softwares
+    ansible.builtin.apt:
+      name: "{{ item }}"
+      state: present
+      update_cache: yes
+    loop:
+      - apache2
+      - mysql-server
+
+  - name: Gather the package facts
+    ansible.builtin.package_facts:
+      manager: auto
+      
+  - name: write content html
+    ansible.builtin.lineinfile:
+        path: "{{ html_root }}/index.html"
+        line: "<h1>Bonjour depuis Ansible sur {{ ansible_hostname }}  {{ ansible_date_time.date }}</h1>"
+        mode: '0644'
+        create: true
+    when: "'apache2' in ansible_facts.packages"
