@@ -1,0 +1,15 @@
+---
+- name: tp2
+  hosts: all
+  remote_user: ambient-user
+  become: true
+  become_user: root
+
+  vars:
+    docker_daemon_options:
+      log-opts:
+        max-size: "100m"
+    docker_users:
+      - ambient-user
+  roles:
+    - geerlingguy.docker
