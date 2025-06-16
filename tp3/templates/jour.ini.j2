@@ -1,0 +1,5 @@
+{% if ( ansible_facts['date_time']['day']|int  % 2 == 0 ) and ( ansible_date_time.hour | int < 12 ) %}pair & inf 12{% endif %}
+{% if ( ansible_facts['date_time']['day']|int  % 2 == 1 ) and ( ansible_date_time.hour | int < 12 ) %}impair & inf 12{% endif %}
+{% if ( ansible_facts['date_time']['day']|int  % 2 == 0 ) and ( ansible_date_time.hour | int >= 12 ) %}pair & sup 12{% endif %}
+{% if ( ansible_facts['date_time']['day']|int  % 2 == 1 )  and ( ansible_date_time.hour | int >= 12 ) %}impair & sup 12{% endif %}
+

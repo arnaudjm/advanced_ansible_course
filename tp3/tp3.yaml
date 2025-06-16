@@ -1,0 +1,121 @@
+---
+- name: tp3
+  hosts: all 
+  remote_user: ambient-user
+  become: true
+  become_user: root
+  vars:
+    html_root: /var/www/html
+    etcjour: /etc/jour
+  tasks:
+
+  - name: Install softwares machine1
+    ansible.builtin.apt:
+      name: "{{ item }}"
+      state: present
+      update_cache: yes
+    loop:
+      - apache2
+      - mysql-server
+    when: ansible_facts['nodename'] == "node01" or ansible_facts['nodename'] == "node02" 
+
+  - name: Install softwares machine3
+    ansible.builtin.apt:
+      name: "{{ item }}"
+      state: present
+      update_cache: yes
+    loop:
+      - git
+      - nginx
+      - cowsay
+    when: ansible_facts['nodename'] == "node03"
+
+  - name: Install pecific ubuntu
+    ansible.builtin.apt:
+      name: "{{ item }}"
+      state: latest
+      update_cache: yes
+    loop:
+      - ufw
+    when: ansible_distribution == "Ubuntu"
+
+
+  - name: check {{ html_root }}
+    ansible.builtin.file:
+      path: "{{ html_root }}" 
+      state: directory
+
+  - name: delete index.html
+    ansible.builtin.file:
+      path: "{{ html_root }}/index.html"
+      state: absent
+
+
+  - name: Gather the package facts
+    ansible.builtin.package_facts:
+      manager: auto
+
+  - name: write content html
+    ansible.builtin.lineinfile:
+        path: "{{ html_root }}/index.html"
+        line: "<h1>Bonjour depuis Ansible sur {{ ansible_hostname }}  {{ ansible_date_time.date }}</h1>"
+        mode: '0644'
+        create: true
+    when: "'apache2' in ansible_facts.packages or 'nginx' in ansible_facts.packages"
+
+  - name: gestion service apache
+    ansible.builtin.service:
+      name: apache2
+      state: started
+      enabled: true
+    when: ansible_facts['nodename'] == "node01" or ansible_facts['nodename'] == "node02"
+
+  - name: gestion service nginx
+    ansible.builtin.service:
+      name: nginx
+      state: started
+      enabled: true
+    when: ansible_facts['nodename'] == "node03"
+
+  - name: creation jour
+    ansible.builtin.template:
+      src: templates/jour.ini.j2
+      dest: "{{ etcjour }}"
+    tags: test
+
+  - name: write jour pair>12h
+    ansible.builtin.lineinfile:
+        path: "{{ etcjour }}"
+        line: "pair et plus tard que midi"
+        mode: '0644'
+        create: true
+    when: (ansible_facts['date_time']['hour']|int > 12) and (ansible_facts['date_time']['day']|int % 2 == 0)
+
+
+  - name: write jour pair<=12h
+    ansible.builtin.lineinfile:
+        path: "{{ etcjour }}"
+        line: "pair et avant que midi"
+        mode: '0644'
+        create: true
+    when: (ansible_facts['date_time']['hour']|int <= 12) and (ansible_facts['date_time']['day']|int % 2 == 0)
+
+  - name: write jour impair>12h
+    ansible.builtin.lineinfile:
+        path: "{{ etcjour }}"
+        line: "impair et plus tard que midi"
+        mode: '0644'
+        create: true
+    when: (ansible_facts['date_time']['hour']|int > 12) and (ansible_facts['date_time']['day']|int % 2 == 1)
+
+
+  - name: write jour impair<=12h
+    ansible.builtin.lineinfile:
+        path: "{{ etcjour }}"
+        line: "impair et avant que midi"
+        mode: '0644'
+        create: true
+    when: (ansible_facts['date_time']['hour']|int <= 12) and (ansible_facts['date_time']['day']|int % 2  == 1)
+
+
+
