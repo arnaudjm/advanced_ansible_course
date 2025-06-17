@@ -1,0 +1,55 @@
+- name: Tp6
+  hosts: all
+  remote_user: ambient-user
+  become: true
+  become_user: root
+  vars_files:
+    - vars/db.yml
+
+  tasks:
+
+    - name: Install wordpress on node2
+      ansible.builtin.apt:
+        name: "{{ item }}"
+        state: present
+        update_cache: true
+      loop:
+        - apache2
+        - ghostscript
+        - libapache2-mod-php
+        - mysql-server
+        - php
+        - php-bcmath
+        - php-curl
+        - php-imagick
+        - php-intl
+        - php-json
+        - php-mbstring
+        - php-mysql
+        - php-xml
+        - php-zip
+      when: ansible_facts['nodename'] == "node02"
+      tags: install
+
+    - name: Install myslq-server on node3
+      ansible.builtin.apt:
+        name: "{{ item }}"
+        state: present
+        update_cache: true
+      loop:
+        - mysql-server
+      when: ansible_facts['nodename'] == "node03"
+      tags: install
+
+
+    - name: Install mysql-server
+      ansible.builtin.include_role:
+        name: geerlingguy.mysql
+      vars:
+        docker_daemon_options:
+          log-opts:
+            max-size: "100m"
+        docker_users:
+          - ambient-user
+      tags: ok
+      when: ansible_facts['nodename'] == "node03"

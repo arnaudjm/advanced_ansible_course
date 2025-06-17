@@ -1,0 +1,8 @@
+ansible-galaxy install -r requirements.yml
+
+ansible-playbook -i hosts.yml  tp6.yml
+
+ansible-playbook -i hosts.yml  tp6.yaml --start-at-task='Install mysql-server'
+
+ansible-lint  tp6.yaml 
+
