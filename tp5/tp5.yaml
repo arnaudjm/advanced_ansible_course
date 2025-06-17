@@ -1,0 +1,28 @@
+---
+- name: Tp5
+  hosts: all
+  remote_user: ambient-user
+  become: true
+  become_user: root
+  vars:
+    lastchanged: /etc/last_changed
+    html_root: /var/www/html
+    etcjour: /etc/jour
+
+  roles:
+    - geerlingguy.docker
+
+  tasks:
+    - name: Import tasks tp3
+      ansible.builtin.include_tasks: tp3.yaml
+
+    - name: Import var tp4
+      ansible.builtin.include_vars: tp4.yaml
+
+
+    - name: Write content html
+      ansible.builtin.lineinfile:
+        path: "{{ lastchanged }}"
+        line: "{{ ansible_date_time.date }}"
+        mode: '0644'
+        create: true
