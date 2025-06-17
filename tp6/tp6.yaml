@@ -5,6 +5,7 @@
   become_user: root
   vars_files:
     - vars/db.yaml
+    - vars/web.yaml
     - vault.yaml
 
   tasks:
@@ -57,9 +58,15 @@
       tags: ok
       when: ansible_facts['nodename'] == "node03"
 
-
-    - name: Generation conf 
+    - name: Generation conf apache
       ansible.builtin.template:
         src: templates/wp-config.ini.j2
         dest: "/usr/share/wordpress/wp-config.php"
+      tags: test
+
+
+    - name: Generation conf 
+      ansible.builtin.template:
+        src: templates/wordpress.conf.ini
+        dest: "/etc/apache2/sites-available/wordpress.conf"
       tags: test
