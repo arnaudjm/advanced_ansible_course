@@ -6,6 +6,8 @@ ansible-playbook -i hosts.yml  tp6.yaml --start-at-task='Install mysql-server'
 
 ansible-lint  tp6.yaml 
 
+ansible-playbook -i hosts.yml --vault-password-file vault.clear.txt tp6.yaml --start-at-task='Debug'
+
 
 
 ansible-vault decrypt vault.yaml --vault-password-file vault.clear.txt
