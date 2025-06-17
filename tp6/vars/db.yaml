@@ -6,4 +6,4 @@ mysql_users:
   - name: user01
     host: "%"
     password: similarly-secure-password 
-    priv: db01.*:ALL"
+    priv: "db01.*:ALL"

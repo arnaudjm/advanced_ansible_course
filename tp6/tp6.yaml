@@ -4,7 +4,8 @@
   become: true
   become_user: root
   vars_files:
-    - vars/db.yml
+    - vars/db.yaml
+    - vault.yaml
 
   tasks:
 
@@ -15,9 +16,9 @@
         update_cache: true
       loop:
         - apache2
+        - wordpress
         - ghostscript
         - libapache2-mod-php
-        - mysql-server
         - php
         - php-bcmath
         - php-curl
@@ -41,9 +42,24 @@
       when: ansible_facts['nodename'] == "node03"
       tags: install
 
+    - name: Debug
+      ansible.builtin.debug:
+        msg:
+        - "mysql_user_name {{ mysql_user_name }}" 
+        - "ansible_default_ipv4.address {{ ansible_default_ipv4.address }}" 
+        - "mysql_databases[0].name {{ mysql_databases[0].name }}"
+        - "salut {{ salut }}"
+      tags: fact
 
     - name: Install mysql-server
       ansible.builtin.include_role:
         name: geerlingguy.mysql
       tags: ok
       when: ansible_facts['nodename'] == "node03"
+
+
+    - name: Generation conf 
+      ansible.builtin.template:
+        src: templates/wp-config.ini.j2
+        dest: "/usr/share/wordpress/wp-config.php"
+      tags: test
