@@ -1,4 +1,3 @@
-
 - name: Install softwares machine1
   ansible.builtin.apt:
     name: "{{ item }}"
@@ -34,8 +33,9 @@
   ansible.builtin.file:
     path: "{{ html_root }}"
     state: directory
+    mode: '0644'
 
-- name: delete index.html
+- name: Delete index.html
   ansible.builtin.file:
     path: "{{ html_root }}/index.html"
     state: absent
@@ -71,9 +71,10 @@
   ansible.builtin.template:
     src: templates/jour.ini.j2
     dest: "{{ etcjour }}"
+    mode: '0644'
   tags: test
 
-- name: write jour pair>12h
+- name: Write jour pair>12h
   ansible.builtin.lineinfile:
     path: "{{ etcjour }}"
     line: "pair et plus tard que midi"
@@ -82,7 +83,7 @@
   when: (ansible_facts['date_time']['hour']|int > 12) and (ansible_facts['date_time']['day']|int % 2 == 0)
 
 
-- name: write jour pair<=12h
+- name: Write jour pair<=12h
   ansible.builtin.lineinfile:
     path: "{{ etcjour }}"
     line: "pair et avant que midi"
@@ -90,7 +91,7 @@
     create: true
   when: (ansible_facts['date_time']['hour']|int <= 12) and (ansible_facts['date_time']['day']|int % 2 == 0)
 
-- name: write jour impair>12h
+- name: Write jour impair>12h
   ansible.builtin.lineinfile:
     path: "{{ etcjour }}"
     line: "impair et plus tard que midi"
@@ -99,7 +100,7 @@
   when: (ansible_facts['date_time']['hour']|int > 12) and (ansible_facts['date_time']['day']|int % 2 == 1)
 
 
-- name: write jour impair<=12h
+- name: Write jour impair<=12h
   ansible.builtin.lineinfile:
     path: "{{ etcjour }}"
     line: "impair et avant que midi"

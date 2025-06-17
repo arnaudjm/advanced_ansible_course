@@ -9,16 +9,12 @@
     html_root: /var/www/html
     etcjour: /etc/jour
 
-  roles:
-    - geerlingguy.docker
-
   tasks:
     - name: Import tasks tp3
       ansible.builtin.include_tasks: tp3.yaml
 
-    - name: Import var tp4
-      ansible.builtin.include_vars: tp4.yaml
-
+    - name: Import tasks tp4
+      ansible.builtin.include_tasks: tp4.yaml
 
     - name: Write content html
       ansible.builtin.lineinfile:
