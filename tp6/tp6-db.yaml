@@ -1,0 +1,34 @@
+- name: Tp6-db
+  hosts: db
+  remote_user: ambient-user
+  become: true
+  become_user: root
+  vars_files:
+    - vars/db.yaml
+    - vars/web.yaml
+    - vault.yaml
+
+  tasks:
+    - name: Install myslq-server
+      ansible.builtin.apt:
+        name: "{{ item }}"
+        state: present
+        update_cache: true
+      loop:
+        - mysql-server
+      tags: install
+
+    - name: Debug
+      ansible.builtin.debug:
+        msg:
+        - "mysql_user_name {{ mysql_user_name }}" 
+        - "ansible_default_ipv4.address {{ ansible_default_ipv4.address }}" 
+        - "mysql_databases[0].name {{ mysql_databases[0].name }}"
+        - "salut {{ salut }}"
+      tags: fact
+
+    - name: Install mysql-server
+      ansible.builtin.include_role:
+        name: geerlingguy.mysql
+      tags: ok
+      when: ansible_facts['nodename'] == "node03"

@@ -1,0 +1,35 @@
+- name: Tp6-web
+  hosts: web
+  remote_user: ambient-user
+  become: true
+  become_user: root
+  vars_files:
+    - vars/db.yaml
+    - vars/web.yaml
+    - vault.yaml
+
+  roles:
+    - geerlingguy.php
+    - geerlingguy.apache
+    - geerlingguy.apache-php-fpm
+
+  tasks:
+    - name: Create wordpress directory
+      ansible.builtin.file:
+        path: "{{ wordpressrootpath }}"
+        state: directory
+        recurse: true
+
+    - name: Download and unarchive wordpress
+      ansible.builtin.unarchive:
+        src: https://fr.wordpress.org/latest-fr_FR.zip
+        dest: /var/www/
+        remote_src: true
+
+    - name: Configure wordpress wp-config.php
+      ansible.builtin.template:
+        src: templates/wp-config.ini.j2
+        dest: "{{ wordpressrootpath }}/wp-config.php"
+        mode: '0644'
+
+
