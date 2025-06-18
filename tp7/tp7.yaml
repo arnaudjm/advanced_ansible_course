@@ -74,3 +74,10 @@
       ansible.builtin.debug:
         msg: "Il fait la meme temp "
       when: pareil
+
+    - name: Reverse
+      ansible.builtin.debug:
+        msg: "{{ item | reverse }}"
+      with_items:
+        -{{ apiresmougins.json.current.temperature_2m }} 
+        -{{ apirescompare.json.current.temperature_2m }} 
