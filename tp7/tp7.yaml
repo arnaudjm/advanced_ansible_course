@@ -23,17 +23,56 @@
       ansible.builtin.debug:
         var: dataok
 
-    - name: Url
+    - name: Facts
       ansible.builtin.set_fact:
-        urlApi: "https://api.open-meteo.com/v1/forecast?latitude={{ local_latitude }}&longitude={{ local_longitude}}&hourly=temperature_2m"
+        urlApiMougins: "https://api.open-meteo.com/v1/forecast?latitude={{ local_latitude }}&longitude={{ local_longitude }}&current=temperature_2m"
+        urlApiCompare: "https://api.open-meteo.com/v1/forecast?latitude=48.86&longitude=2.33&current=temperature_2m"
+        currentDate: 
 
-    - name : Call api
+    - name : Call api Mougins
       ansible.builtin.uri:
-        url: "{{ urlApi }}"
+        url: "{{ urlApiMougins }}"
         method: GET
         return_content: yes
-      register: apires
+      register: apiresMougins
 
-    - name: Display apires
+    - name : Call api Compare
+      ansible.builtin.uri:
+        url: "{{ urlApiCompare }}"
+        method: GET
+        return_content: yes
+      register: apiresCompare
+
+    - name: Display current temp Mougins
       ansible.builtin.debug:
-        var: apires
+        var: apiresMougins.json.current.temperature_2m
+
+    - name: Display  current temp Compare
+      ansible.builtin.debug:
+        var: apiresCompare.json.current.temperature_2m
+
+    - name: Facts compare
+      ansible.builtin.set_fact:
+        plusfroid: "{{ apiresCompare.json.current.temperature_2m | float > apiresMougins.json.current.temperature_2m | float }}"
+        pluschaud: "{{ apiresCompare.json.current.temperature_2m | float < apiresMougins.json.current.temperature_2m | float }}"
+        pareil: "{{ apiresCompare.json.current.temperature_2m | float == apiresMougins.json.current.temperature_2m | float }}"
+        currentDate: 
+
+    - name: display
+      ansible.builtin.debug:
+        msg: "plusfroid={{ plusfroid }} /pluschaud={{ pluschaud }} /pareil={{ pareil }} / "
+
+    - name: Comparaison froid
+      ansible.builtin.debug:
+        msg: "Il fait plus froid a Mougins "
+      when: plusfroid
+
+    - name: Comparaison chaud
+      ansible.builtin.debug:
+        msg: "Il fait plus chaud a Mougins "
+      when: pluschaud
+
+    - name: Comparaison pareil
+      ansible.builtin.debug:
+        msg: "Il fait la meme temp "
+      when: pareil
