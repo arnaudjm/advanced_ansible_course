@@ -1,0 +1,13 @@
+- name: Tp8
+  hosts: web
+  remote_user: ambient-user
+  become: true
+  become_user: root
+
+  vars_files:
+    - vars/conf.yaml
+
+  tasks:
+  - name: Execution Role
+    ansible.builtin.include_role:
+      name: test.wordpress

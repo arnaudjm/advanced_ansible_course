@@ -1,0 +1,4 @@
+wordpress_db_name: salutDb
+wordpress_db_username: userJM
+wordpress_db_password: password
+wordpress_db_ip: 127.0.0.1

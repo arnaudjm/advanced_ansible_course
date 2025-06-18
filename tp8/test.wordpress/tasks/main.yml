@@ -1,0 +1,30 @@
+- name: Execution Role php
+  ansible.builtin.include_role:
+    name: geerlingguy.php
+
+- name: Execution Role apache
+  ansible.builtin.include_role:
+    name: geerlingguy.apache
+
+- name: Execution Role php-fpm
+  ansible.builtin.include_role:
+    name: geerlingguy.apache-php-fpm
+
+
+- name: Create wordpress directory
+  ansible.builtin.file:
+    path: "{{ wordpressrootpath }}"
+    state: directory
+    recurse: true
+
+- name: Download and unarchive wordpress
+  ansible.builtin.unarchive:
+    src: https://fr.wordpress.org/latest-fr_FR.zip
+    dest: /var/www/
+    remote_src: true
+
+- name: Configure wordpress wp-config.php
+  ansible.builtin.template:
+    src: wp-config.ini.j2
+    dest: "{{ wordpressrootpath }}/wp-config.php"
+    mode: '0644'

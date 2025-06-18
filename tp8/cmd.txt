@@ -1,0 +1,19 @@
+ansible-galaxy install -r requirements.yml
+
+ansible-playbook -i hosts.yml  tp6.yml
+
+ansible-playbook -i hosts.yml  tp6.yaml --start-at-task='Install mysql-server'
+
+ansible-lint  tp6.yaml 
+
+ansible-playbook -i hosts.yml --vault-password-file vault.clear.txt tp6.yaml --start-at-task='Debug'
+
+
+
+ansible-vault decrypt vault.yaml --vault-password-file vault.clear.txt
+ansible-vault encrypt vault.yaml --vault-password-file vault.clear.txt
+ansible-vault view vault.yaml --vault-password-file vault.clear.txt
+
+ansible-playbook -i hosts.yml --vault-password-file vault.clear.txt tp6-db.yaml
+ansible-playbook -i hosts.yml --vault-password-file vault.clear.txt tp6-web.yaml
+
