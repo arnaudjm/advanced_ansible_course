@@ -1,0 +1,39 @@
+- name: Tp7
+  hosts: main
+  remote_user: ambient-user
+  become: true
+  become_user: root
+  vars:
+    csvfile: "/home/ambient-user/advanced_ansible_course/tp7/temperature.csv"
+    local_longitude: "7.00649100"
+    local_latitude: "43.60233190"
+
+  tasks:
+    - name: read Csv
+      ansible.builtin.read_csv:
+        path: "{{ csvfile }}" 
+        delimiter: ','
+      register: csvdata
+
+    - name: Clean + sort
+      ansible.builtin.set_fact:
+        dataok: "{{ csvdata.list | unique | sort(attribute='time') }}"
+
+    - name: Display
+      ansible.builtin.debug:
+        var: dataok
+
+    - name: Url
+      ansible.builtin.set_fact:
+        urlApi: "https://api.open-meteo.com/v1/forecast?latitude={{ local_latitude }}&longitude={{ local_longitude}}&hourly=temperature_2m"
+
+    - name : Call api
+      ansible.builtin.uri:
+        url: "{{ urlApi }}"
+        method: GET
+        return_content: yes
+      register: apires
+
+    - name: Display apires
+      ansible.builtin.debug:
+        var: apires
